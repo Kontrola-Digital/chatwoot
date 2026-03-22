@@ -24,14 +24,14 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=dokploy-network
-      - traefik.http.routers.eezibot-web.rule=Host(`eezibot.com`)
-      - traefik.http.routers.eezibot-web.entrypoints=web
-      - traefik.http.routers.eezibot-web.middlewares=redirect-to-https
-      - traefik.http.services.eezibot-web.loadbalancer.server.port=3000
-      - traefik.http.routers.eezibot-websecure.rule=Host(`eezibot.com`)
-      - traefik.http.routers.eezibot-websecure.entrypoints=websecure
-      - traefik.http.routers.eezibot-websecure.tls.certresolver=letsencrypt
-      - traefik.http.services.eezibot-websecure.loadbalancer.server.port=3000
+      - traefik.http.routers.eezibot.rule=Host(`eezibot.com`)
+      - traefik.http.routers.eezibot.entrypoints=web
+      - traefik.http.routers.eezibot.middlewares=redirect-to-https
+      - traefik.http.services.eezibot.loadbalancer.server.port=3000
+      - traefik.http.routers.eezibot-secure.rule=Host(`eezibot.com`)
+      - traefik.http.routers.eezibot-secure.entrypoints=websecure
+      - traefik.http.routers.eezibot-secure.tls.certresolver=letsencrypt
+      - traefik.http.services.eezibot-secure.loadbalancer.server.port=3000
     networks:
       - default
       - dokploy-network
