@@ -21,6 +21,20 @@ services:
     entrypoint: docker/entrypoints/rails.sh
     command: ['bundle', 'exec', 'rails', 's', '-p', '3000', '-b', '0.0.0.0']
     restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.eezibot-web.rule=Host(`eezibot.com`)
+      - traefik.http.routers.eezibot-web.entrypoints=web
+      - traefik.http.routers.eezibot-web.middlewares=redirect-to-https
+      - traefik.http.services.eezibot-web.loadbalancer.server.port=3000
+      - traefik.http.routers.eezibot-websecure.rule=Host(`eezibot.com`)
+      - traefik.http.routers.eezibot-websecure.entrypoints=websecure
+      - traefik.http.routers.eezibot-websecure.tls.certresolver=letsencrypt
+      - traefik.http.services.eezibot-websecure.loadbalancer.server.port=3000
+    networks:
+      - default
+      - dokploy-network
 
   sidekiq:
     <<: *base
@@ -33,6 +47,9 @@ services:
       - INSTALLATION_ENV=docker
     command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
     restart: always
+    networks:
+      - default
+      - dokploy-network
 
   postgres:
     image: pgvector/pgvector:pg16
@@ -44,8 +61,9 @@ services:
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-chatwoot}
       - POSTGRES_USER=postgres
-      # Please provide your own password.
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-securepassword123}
+    networks:
+      - default
 
   redis:
     image: redis:alpine
@@ -56,3 +74,9 @@ services:
       - /data/redis:/data
     ports:
       - '127.0.0.1:6379:6379'
+    networks:
+      - default
+
+networks:
+  dokploy-network:
+    external: true
